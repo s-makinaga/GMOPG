@@ -22,6 +22,15 @@ class GMOPG_Endpoints{
     // Entry 関係 （取引登録）
     const ENTRY_TRAN		= '/EntryTran.idPass';
     const EXEC_TRAN			= '/ExecTran.idPass';
+    const ALTER_TRAN		= '/AlterTran.idPass';
+
+    // RakutenEntry 関係 （取引登録）
+    const ENTRY_TRAN_RAKUTEN= '/EntryTranRakutenId.idPass';
+    const EXEC_TRAN_RAKUTEN	= '/ExecTranRakutenId.idPass';
+    const ALTER_TRAN_RAKUTEN= '/AlterTran.idPass';
+
+    // 決済後カード登録
+    const TRADED_CARD       = '/TradedCard.idPass';
 
     /**
      * エンドポイントのルートを返す

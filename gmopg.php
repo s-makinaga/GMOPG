@@ -156,22 +156,118 @@ class GMOPG{
 		return $result;
 	}
 
-	public function execTran($param){
+	public function execTran($params){
 
 		$endpoint = GMOPG_Endpoints::EXEC_TRAN;
 		$param = array(
-			'AccessID'      => $param['access_id'],
-			'AccessPass'    => $param['access_pw'],
-			'OrderID' 		=> $param['order_id'],
+			'AccessID'      => $params['access_id'],
+			'AccessPass'    => $params['access_pw'],
+			'OrderID' 		=> $params['order_id'],
 			'Method' 		=> '1', // 1:一括, 2:分割, 3:ボーナス一括, 4:ポーナス分割, 5:リボ
 			//'PayTimes'	=> 12,
 			'SiteID'        => $this->SiteID,
 			'SitePass'      => $this->SitePass,
-			'MemberID' 		=> $param['member_id'],
+			'MemberID' 		=> $params['member_id'],
 			'SeqMode' 		=> '1', // 物理モード
-			'CardSeq'		=> $param['card_seq'],
+			'CardSeq'		=> $params['card_seq'],
 			//'CardPass'		=> $param['card_pass'],
-			'SecurityCode'	=> $param['security_code'],
+			'SecurityCode'	=> $params['security_code'],
+		);
+
+		// 新規カード登録の場合
+		if(false === isset($params['card_seq']) || '' === $params['card_seq']){
+			unset($param['CardSeq']);
+			if(isset($params['card_number'])) $param['CardNo'] = $params['card_number'];
+			if(isset($params['card_expire'])) $param['Expire'] = $params['card_expire'];
+			if(isset($params['token'])) $param['Token'] = $params['token'];			
+		}
+
+		//echo("<pre>");var_dump($param);echo("</pre>");
+		$result = GMOPG_Endpoints::post($endpoint, $param, $this->isTest);
+
+		return $result;
+	}
+
+	// 決済取消し処理
+	public function voidTran($params){
+
+		$endpoint = GMOPG_Endpoints::ALTER_TRAN;
+		$param = array(
+			'ShopID'        => $params['shop_id'],
+			'ShopPass'      => $params['shop_pw'],
+			'AccessID'      => $params['access_id'],
+			'AccessPass'    => $params['access_pw'],
+			'JobCd' 		=> 'VOID', // VOID:取消, RETURN:返品, RETURNX:月跨り返品
+		);
+
+		$result = GMOPG_Endpoints::post($endpoint, $param, $this->isTest);
+
+		return $result;
+	}
+
+
+	public function entryTranRakuten($param){
+
+		$endpoint = GMOPG_Endpoints::ENTRY_TRAN_RAKUTEN;
+		$param = array(
+			'ShopID'        => $param['shop_id'],
+			'ShopPass'      => $param['shop_pw'],
+			'OrderID' 		=> $param['order_id'],
+			'JobCd' 		=> 'AUTH', // CHECK:有効性チェック, CAPTURE:即時売上, AUTH:仮売上, SAUTH: 簡易オーソリ
+			'Amount'		=> $param['amount'],
+			'Tax'			=> $param['tax'],
+		);
+
+		$result = GMOPG_Endpoints::post($endpoint, $param, $this->isTest);
+
+		return $result;
+	}
+
+	public function execTranRakuten($params){
+
+		$endpoint = GMOPG_Endpoints::EXEC_TRAN_RAKUTEN;
+		$param = array(
+			'ShopID'        => $params['shop_id'],
+			'ShopPass'      => $params['shop_pw'],
+			'AccessID'      => $params['access_id'],
+			'AccessPass'    => $params['access_pw'],
+			'OrderID' 		=> $params['order_id'],
+			'ItemId' 		=> $params['item_id'],
+			'ItemSubId' 	=> $params['item_sub_id'],
+			'ItemName' 		=> $params['item_name'],
+			'RetURL' 		=> $params['return_url'],
+			'ErrorRcvURL' 	=> $params['error_url'],
+		);
+
+		// 新規カード登録の場合
+		if(false === isset($params['card_seq']) || '' === $params['card_seq']){
+			unset($param['CardSeq']);
+			if(isset($params['card_number'])) $param['CardNo'] = $params['card_number'];
+			if(isset($params['card_expire'])) $param['Expire'] = $params['card_expire'];
+			if(isset($params['token'])) $param['Token'] = $params['token'];			
+		}
+
+		//echo("<pre>");var_dump($param);echo("</pre>");
+		$result = GMOPG_Endpoints::post($endpoint, $param, $this->isTest);
+
+		return $result;
+	}
+
+	/**
+	 * 決済後カード登録
+	 * @param  [type] $param [description]
+	 * @return [type]        [description]
+	 */
+	public function tradedCard($param){
+
+		$endpoint = GMOPG_Endpoints::TRADED_CARD;
+		$param = array(
+			'SiteID'        => $this->SiteID,
+			'SitePass'      => $this->SitePass,
+			'ShopID'        => $param['shop_id'],
+			'ShopPass'      => $param['shop_pw'],
+			'OrderID' 		=> $param['order_id'],
+			'MemberID' 		=> $param['member_id'],
 		);
 
 		$result = GMOPG_Endpoints::post($endpoint, $param, $this->isTest);
